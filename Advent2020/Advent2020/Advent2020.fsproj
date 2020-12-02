@@ -6,6 +6,11 @@
 
     <ItemGroup>
         <Compile Include="Day1.fs" />
+        <Compile Include="Day2.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FParsec" Version="1.1.1" />
     </ItemGroup>
 
 </Project>
