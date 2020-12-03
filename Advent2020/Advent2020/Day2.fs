@@ -1,7 +1,6 @@
 ﻿namespace Advent2020
 
 open System
-open System.Text.RegularExpressions
 open FParsec
 
 module Day2 =
