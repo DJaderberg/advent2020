@@ -5,12 +5,13 @@ open System.Collections.Generic
 open FParsec
 
 module Day4 =
-    let key = many letter |>> String.Concat
-    let value = many (letter <|> digit <|> pchar '#') |>> String.Concat
+    let key = many1 letter |>> String.Concat
+    let value = many1 (letter <|> digit <|> pchar '#') |>> String.Concat
     let kvp = (key .>> pchar ':' .>>. value) .>> optional (pchar ' ' <|> pchar '\n')
-    let passport = (many1 (kvp)) .>> spaces |>> dict
+    let passport = many kvp |>> dict
+    let passportList = sepEndBy passport spaces1
     let parsec input =
-        match run (many passport) input with
+        match run passportList input with
         | Success(v, _, _) -> v
         | Failure(e, _, _) -> raise (Exception("Parsing error: " + e))
         
