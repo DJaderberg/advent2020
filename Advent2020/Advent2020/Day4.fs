@@ -5,16 +5,7 @@ open System.Linq
 open System.Collections.Generic
 open FParsec
 
-module Day4 =
-    type MaybeBuilder() =
-        member this.Bind(x, f) = 
-            match x with
-            | None -> None
-            | Some a -> f a
-        member this.Return(x) = 
-            Some x
-    let maybe = MaybeBuilder()
-
+module Passport =
     type BirthYear = BirthYear of int
     type IssueYear = IssueYear of int
     type ExpirationYear = ExpirationYear of int
@@ -22,8 +13,8 @@ module Day4 =
     type Height = Height of int * LengthUnit
     type HairColor = HairColor of string
     type EyeColor = Amber | Blue | Brown | Gray | Green | Hazel | Other
-    type PassportId = PassportId of int
-    type CountryId = CountryId of int
+    type PassportId = PassportId of string
+    type CountryId = CountryId of string
     type Passport = {
         birthYear: BirthYear
         issueYear: IssueYear
@@ -80,13 +71,25 @@ module Day4 =
     let passportId (s: String) =
         if s.Length = 9
         then
-            tryInt s
+            tryInt s |> Option.map (fun _ -> s)
         else
             None
         |> Option.map PassportId
         
-    let countryId (s: String) =
+    let countryId _ =
         None
+
+module Day4 =
+    open Passport
+    type MaybeBuilder() =
+        member this.Bind(x, f) = 
+            match x with
+            | None -> None
+            | Some a -> f a
+        member this.Return(x) = 
+            Some x
+    let maybe = MaybeBuilder()
+
     let key = many1 letter |>> String.Concat
     let value = many1 (letter <|> digit <|> pchar '#') |>> String.Concat
     let kvp = (key .>> pchar ':' .>>. value) .>> optional (pchar ' ' <|> pchar '\n')

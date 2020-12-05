@@ -80,7 +80,7 @@ hcl:#623a2f"
             height = Height (74, Inch)
             hairColor = HairColor "623a2f"
             eyeColor = Green
-            passportId = PassportId 087499704
+            passportId = PassportId "087499704"
             countryId = None
         }
     Assert.Equal(Some <| Some expected, result)
