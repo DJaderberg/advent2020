@@ -4,6 +4,7 @@ open FParsec
 open System.IO
 open Xunit
 open Advent2020.Day4
+open Advent2020.Passport
 
 [<Fact>]
 let ``Part 1 Example`` () =
