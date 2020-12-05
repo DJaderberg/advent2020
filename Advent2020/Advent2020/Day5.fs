@@ -1,23 +1,22 @@
 ﻿namespace Advent2020
 
 open System
-open System.Linq
-open System.Collections.Generic
 open FParsec
 
 module Day5 =
-    let cToB c = match c with | 'B' -> 1 | 'F' -> 0 | _ -> -1
-    let rToB c = match c with | 'R' -> 1 | 'L' -> 0 | _ -> -1
-    let rec arrToId exp sum arr =
-        let h = List.head arr
-        match exp with
-        | 1 -> sum + h*exp
-        | _ -> arrToId (exp/2) (sum+h*exp) (List.tail arr)
-    let row = manyMinMaxSatisfy 7 7 (fun c -> c = 'F' || c = 'B') |>> (Seq.toList >> List.map cToB >> (arrToId 64 0))
-    let col = manyMinMaxSatisfy 3 3 (fun c -> c = 'R' || c = 'L') |>> (Seq.toList >> List.map rToB >> (arrToId 4 0))
-    let id = row .>>. col |>> (fun (r, c) -> r * 8 + c)
+    let cToDigit c =
+        match c with
+        | 'B' -> '1'
+        | 'R' -> '1'
+        | 'F' -> '0'
+        | 'L' -> '0'
+        | _ -> 'z'
+    let toInt str = int ("0b" + str)
+    let all =
+        manyMinMaxSatisfy 10 10 (fun _ -> true) |>>
+        (Seq.toList >> List.map cToDigit >> String.Concat >> toInt)
 
-    let idList = sepEndBy id spaces1
+    let idList = sepEndBy all spaces1
     let parsec input =
         match run idList input with
         | Success(v, _, _) -> v
@@ -28,8 +27,9 @@ module Day5 =
         |> List.max
         
     let part2 input =
-        let set =
+        let found =
             parsec input
             |> Set.ofList
-        Seq.find (fun seat -> not (Set.contains seat set)) (seq { 96 .. 897 })
+        let all = seq { Set.minElement found .. Set.maxElement found } |> Set.ofSeq
+        all - found |> Set.toList |> List.head
 
