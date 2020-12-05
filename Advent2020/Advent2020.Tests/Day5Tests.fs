@@ -1,6 +1,5 @@
 ﻿module Advent2020.Tests.Day5Tests
 
-open FParsec
 open System.IO
 open Xunit
 open Advent2020.Day5
