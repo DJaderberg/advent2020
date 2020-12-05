@@ -89,4 +89,4 @@ hcl:#623a2f"
 let ``Part 2`` () =
     let input = File.ReadAllText("Data/day4.txt")
     let result = part2 input
-    Assert.Equal(226, result)
+    Assert.Equal(160, result)

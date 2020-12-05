@@ -15,7 +15,6 @@ module Day4 =
             Some x
     let maybe = MaybeBuilder()
 
-
     type BirthYear = BirthYear of int
     type IssueYear = IssueYear of int
     type ExpirationYear = ExpirationYear of int
@@ -25,16 +24,6 @@ module Day4 =
     type EyeColor = Amber | Blue | Brown | Gray | Green | Hazel | Other
     type PassportId = PassportId of int
     type CountryId = CountryId of int
-    type Info =
-        | BirthYearInfo of BirthYear
-        | IssueYearInfo of IssueYear
-        | ExpirationYearInfo of ExpirationYear
-        | HeightInfo of Height
-        | HairColorInfo of HairColor
-        | EyeColorInfo of EyeColor
-        | PassportIdInfo of PassportId
-        | CountryIdInfo of CountryId
-        
     type Passport = {
         birthYear: BirthYear
         issueYear: IssueYear
@@ -51,29 +40,29 @@ module Day4 =
             int str |> Some
         with :? FormatException -> None
     
-    let birthYear i = if i >= 1920 && i <= 2002 then Some (BirthYearInfo (BirthYear i)) else None
-    let issueYear i = if i >= 2010 && i <= 2020 then Some (IssueYearInfo (IssueYear i)) else None
-    let expirationYear i = if i >= 2020 && i <= 2030 then Some (ExpirationYearInfo (ExpirationYear i)) else None
-    let height (str: String): Info option =
+    let birthYear i = if i >= 1920 && i <= 2002 then Some (BirthYear i) else None
+    let issueYear i = if i >= 2010 && i <= 2020 then Some (IssueYear i) else None
+    let expirationYear i = if i >= 2020 && i <= 2030 then Some (ExpirationYear i) else None
+    let height (str: String) =
         if str.EndsWith("cm")
         then
             let v = (str.TrimEnd('c', 'm')) |> tryInt
-            v |> Option.bind (fun v -> if v >= 150 && v <= 193 then Some (HeightInfo (Height (v, Cm))) else None)
+            v |> Option.bind (fun v -> if v >= 150 && v <= 193 then Some (Height (v, Cm)) else None)
         else if str.EndsWith("in")
         then
             let v = (str.TrimEnd('i', 'n')) |> tryInt
-            v |> Option.bind (fun v -> if v >= 59 && v <= 76 then Some (HeightInfo (Height (v, Inch))) else None)
+            v |> Option.bind (fun v -> if v >= 59 && v <= 76 then Some (Height (v, Inch)) else None)
         else
             None
             
     let hairColor (s: String) =
         let hex c =
-            ['0'; '1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'; '9'; 'a'; 'b'; 'c'; 'd'; 'e'; 'f']
-            |> Set.ofList
+            Seq.append (seq { '0' .. '9' }) (seq {'a' .. 'f' })
+            |> Set.ofSeq
             |> Set.contains c
         if s.StartsWith('#') && s.Length = 7 && (s |> Seq.toList |> Seq.filter hex).Count() = 6
         then
-            HairColor s.[1..] |> HairColorInfo |> Some
+            HairColor s.[1..] |> Some
         else
             None
             
@@ -87,7 +76,6 @@ module Day4 =
         | "hzl" -> Some Hazel
         | "oth" -> Some Other
         | _ -> None
-        |> Option.map EyeColorInfo
         
     let passportId (s: String) =
         if s.Length = 9
@@ -95,52 +83,40 @@ module Day4 =
             tryInt s
         else
             None
-        |> Option.map (PassportId >> PassportIdInfo)
+        |> Option.map PassportId
         
     let countryId (s: String) =
         None
-    let info (kvp: string * string) =
-        match kvp with
-        | ("byr", v) -> tryInt v |> Option.bind birthYear
-        | ("iyr", v) -> tryInt v |> Option.bind issueYear
-        | ("eyr", v) -> tryInt v |> Option.bind expirationYear
-        | ("hgt", v) -> height v
-        | ("hcl", v) -> hairColor v
-        | ("ecl", v) -> eyeColor v
-        | ("pid", v) -> passportId v
-        | ("cid", v) -> countryId v
-        | _ -> None
     let key = many1 letter |>> String.Concat
     let value = many1 (letter <|> digit <|> pchar '#') |>> String.Concat
     let kvp = (key .>> pchar ':' .>>. value) .>> optional (pchar ' ' <|> pchar '\n')
-    let pinfo = kvp |>> info
-    let infos = many pinfo |>> List.choose id
-    
     let basicPassport = many kvp |>> dict
-    let passport (infos: Info list) =
+    let get (dict: IDictionary<'a,'a>) key =
+        let found, value = dict.TryGetValue key
+        if found then Some value else None
+    let passport (dict: IDictionary<string,string>) =
         maybe
             {
-            let! birthYear = List.choose (fun i -> match i with BirthYearInfo e -> Some e | _ -> None) infos |> List.tryHead
-            let! issueYear = List.choose (fun i -> match i with IssueYearInfo e -> Some e | _ -> None) infos |> List.tryHead
-            let! expirationYear = List.choose (fun i -> match i with ExpirationYearInfo e -> Some e | _ -> None) infos |> List.tryHead
-            let! height = List.choose (fun i -> match i with HeightInfo e -> Some e | _ -> None) infos |> List.tryHead
-            let! hairColor = List.choose (fun i -> match i with HairColorInfo e -> Some e | _ -> None) infos |> List.tryHead
-            let! eyeColor = List.choose (fun i -> match i with EyeColorInfo e -> Some e | _ -> None) infos |> List.tryHead
-            let! passportId = List.choose (fun i -> match i with PassportIdInfo e -> Some e | _ -> None) infos |> List.tryHead
-            let countryId = List.choose (fun i -> match i with CountryIdInfo e -> Some e | _ -> None) infos |> List.tryHead
+            let! birthYear = get dict "byr" |> Option.bind tryInt |> Option.bind birthYear
+            let! issueYear = get dict "iyr" |> Option.bind tryInt |> Option.bind issueYear
+            let! expirationYear = get dict "eyr" |> Option.bind tryInt |> Option.bind expirationYear
+            let! height = get dict "hgt" |> Option.bind height
+            let! hairColor = get dict "hcl" |> Option.bind hairColor
+            let! eyeColor = get dict "ecl" |> Option.bind eyeColor
+            let! passportId = get dict "pid" |> Option.bind passportId
             return
                 {
-                birthYear = birthYear;
-                issueYear = issueYear;
-                expirationYear = expirationYear;
-                height = height;
-                hairColor = hairColor;
-                eyeColor = eyeColor;
-                passportId = passportId;
-                countryId = countryId;
+                 birthYear = birthYear
+                 issueYear = issueYear
+                 expirationYear = expirationYear
+                 height = height
+                 hairColor = hairColor
+                 eyeColor = eyeColor
+                 passportId = passportId
+                 countryId = get dict "cid" |> Option.bind countryId
                 }
             }
-    let ppassport = infos |>> passport
+    let ppassport = basicPassport |>> passport
     let passportList = sepEndBy ppassport spaces1
     let passportInfoList = sepEndBy basicPassport spaces1
     let parsec1 input =
