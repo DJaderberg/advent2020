@@ -18,7 +18,7 @@ let ``Part 1 Example`` () =
     
 [<Fact>]
 let ``Part 1`` () =
-    let numbers = File.ReadAllText("Data/day1part1.txt")
+    let numbers = File.ReadAllText("Data/day1.txt")
     let result = part1 numbers
     Assert.Equal(787776, result)
     
@@ -35,6 +35,6 @@ let ``Part 2 Example`` () =
     
 [<Fact>]
 let ``Part 2`` () =
-    let numbers = File.ReadAllText("Data/day1part1.txt")
+    let numbers = File.ReadAllText("Data/day1.txt")
     let result = part2 numbers
     Assert.Equal(262738554, result)
