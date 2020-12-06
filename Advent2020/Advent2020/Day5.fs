@@ -4,13 +4,7 @@ open System
 open FParsec
 
 module Day5 =
-    let cToDigit c =
-        match c with
-        | 'B' -> '1'
-        | 'R' -> '1'
-        | 'F' -> '0'
-        | 'L' -> '0'
-        | _ -> 'z'
+    let cToDigit = function | 'B' | 'R' -> '1' | 'F' | 'L' -> '0' | _ -> raise (Exception "cToDigit")
     let toInt str = int ("0b" + str)
     let all =
         manyMinMaxSatisfy 10 10 (fun _ -> true) |>>
