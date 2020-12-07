@@ -33,6 +33,14 @@ module Day7 =
                 traverseGraph graphElements (Set.add element matches) (List.tail queue)
         | None -> matches
         
+    let rec traverseGraphSum (graphElements: IDictionary<string, seq<string * int>>) (element: string * int) =
+        let key = fst element
+        if graphElements.ContainsKey key then
+            let hits = graphElements.Item key
+            1 + ((Seq.map (fun h -> snd h * traverseGraphSum graphElements h) hits) |> Seq.sum)
+        else
+            1
+        
     let matchSet input =
         let parsed = parsec rules input
         let containsMap = parsed |> Seq.map (fun kvp -> (kvp.Key, kvp.Value.Keys |> Seq.cast<string>))
@@ -46,5 +54,16 @@ module Day7 =
             |> dict
         traverseGraph inverted Set.empty (List.singleton "shinygold")
     let part1 input = matchSet input |> Set.count
+    
+    let matchSetSum input =
+        let parsed = parsec rules input
+        let containsMap =
+            parsed
+            |> Seq.map
+                   (fun kvp -> (kvp.Key, kvp.Value
+                                |> Seq.cast<KeyValuePair<string, int>>
+                                |> Seq.map (fun kvp -> (kvp.Key, kvp.Value))))
+            |> dict
+        traverseGraphSum containsMap ("shinygold", 1) - 1
         
-    let part2 input = raise (NotImplementedException())
+    let part2 input = matchSetSum input
