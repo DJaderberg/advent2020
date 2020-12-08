@@ -41,5 +41,5 @@ acc +6"
 let ``Part 2`` () =
     let numbers = File.ReadAllText("Data/day8.txt")
     let result = part2 numbers
-    Assert.Equal(8, result)
+    Assert.Equal(1000, result)
 
