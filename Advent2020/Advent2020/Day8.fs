@@ -20,7 +20,9 @@ module Day8 =
         
     let rec exec (program: Instruction[]) (alreadyExeced: Set<int>) acc pc =
         if Set.contains pc alreadyExeced then
-            acc
+            FSharp.Core.Error acc
+        else if Array.length program <= pc then
+            FSharp.Core.Ok acc
         else
             match Array.get program pc with
             | Nop _ -> exec program (Set.add pc alreadyExeced) acc (pc+ 1)
@@ -28,7 +30,24 @@ module Day8 =
             | Acc i -> exec program (Set.add pc alreadyExeced) (acc + i) (pc+ 1)
     let part1 input =
         let prog = parsec program input
-        exec prog Set.empty 0 0
+        match exec prog Set.empty 0 0 with
+        | FSharp.Core.Error i -> i
+        | FSharp.Core.Ok i -> i
         
-    let part2 input = raise (NotImplementedException())
+        
+    let part2 input = 
+        let prog = parsec program input
+        let update (i: int, instr: Instruction) program =
+            let newArray = Array.copy program
+            Array.set newArray i instr
+            newArray
+        let success = function |FSharp.Core.Ok v -> Some v |FSharp.Core.Error _ -> None
+        let perturbed =
+            seq { 0 .. Array.length prog - 1 }
+            |> Seq.map (fun i -> (i, Array.get prog i))
+            |> Seq.choose (function | (i, Jmp v) -> Some (i, Nop v) | (i, Nop v) -> Some (i, Jmp v) | _ -> None)
+            |> Seq.choose (fun tup -> exec (update tup prog) Set.empty 0 0 |> success)
+            |> Seq.head
+        perturbed
+        
 

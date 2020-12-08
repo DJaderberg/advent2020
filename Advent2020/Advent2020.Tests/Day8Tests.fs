@@ -34,12 +34,12 @@ acc -99
 acc +1
 jmp -4
 acc +6"
-    let result = part1 input
+    let result = part2 input
     Assert.Equal(8, result)
     
 [<Fact>]
-let ``Part 1`` () =
+let ``Part 2`` () =
     let numbers = File.ReadAllText("Data/day8.txt")
-    let result = part1 numbers
-    Assert.Equal(2058, result)
+    let result = part2 numbers
+    Assert.Equal(8, result)
 
