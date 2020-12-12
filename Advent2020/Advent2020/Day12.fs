@@ -23,6 +23,7 @@ module Day12 =
         | 'S' -> South
         | 'L' -> Left
         | 'R' -> Right
+    
     let instr = (anyChar |>> direction) .>>. (many1 digit |>> String.Concat |>> int) |>> (fun (f, v) -> f v)
     let all = sepEndBy1 instr newline
     let parsec parser input =
@@ -52,39 +53,33 @@ module Day12 =
         | Left i -> (degRange (facing - i), location)
         | Right i -> (degRange (facing + i), location)
         
-    let moveForward (lx, ly) (wx, wy) n =
-        let (dx, dy) = (wx - lx, wy - ly)
-        let newWaypoint = add (wx, wy) (n * dx, n * dy)
-        let newLocation = add newWaypoint (-dx, -dy)
-        (newLocation, newWaypoint)
+    let moveForward location (wx, wy) n =
+        let newLocation = add location (n * wx, n * wy)
+        newLocation
         
-    let rec rotate (lx, ly) (wx, wy) deg =
-        let (dx, dy) = (wx - lx, wy - ly)
+    let rec rotate (wx, wy) deg =
         match deg with
         | 0 -> (wx, wy)
-        | _ -> rotate (lx, ly) (lx - dy, ly + dx) (deg - 90)
+        | _ -> rotate (-wy, wx) (deg - 90)
         
         
     let rec move2 (location, waypoint) step =
         match step with
-        | Forward i -> moveForward location waypoint i
+        | Forward i -> (moveForward location waypoint i, waypoint)
         | North i -> (location, add waypoint (0, i))
         | East i -> (location, add waypoint (-i, 0))
         | West i -> (location, add waypoint (i, 0))
         | South i -> (location, add waypoint (0, -i))
-        | Left i -> (location, rotate location waypoint (degRange -i))
-        | Right i -> (location, rotate location waypoint (degRange i))
+        | Left i -> (location, rotate waypoint (degRange -i))
+        | Right i -> (location, rotate waypoint (degRange i))
         
     let part1 input =
         let instructions = parsec all input
-        let res = List.fold move (90, (0,0)) instructions |> snd
-        let x = abs (fst res)
-        let y = abs (snd res)
-        x + y
+        let (_, (x, y)) = List.fold move (90, (0,0)) instructions
+        abs x + abs y
+        
     let part2 input =
         let instructions = parsec all input
-        let (loc, wayp) = List.fold move2 ((0,0), (-10, 1)) instructions
-        let x = abs (fst loc)
-        let y = abs (snd loc)
-        x + y
+        let ((x, y), _) = List.fold move2 ((0,0), (-10, 1)) instructions
+        abs x + abs y
         
