@@ -14,6 +14,7 @@ module Day12 =
         | South of int
         | Left of int
         | Right of int
+        
     let direction c =
         match c with
         | 'F' -> Forward
@@ -25,7 +26,7 @@ module Day12 =
         | 'R' -> Right
     
     let instr = (anyChar |>> direction) .>>. (many1 digit |>> String.Concat |>> int) |>> (fun (f, v) -> f v)
-    let all = sepEndBy1 instr newline
+    let all = sepEndBy1 instr newline .>> eof
     let parsec parser input =
         match run parser input with
         | Success(v, _, _) -> v
@@ -38,6 +39,7 @@ module Day12 =
         else x
         
     let add (x, y) (a, b) = (x + a, y + b)
+    
     let rec move (facing, location) step =
         match step with
         | Forward i -> 
@@ -61,7 +63,6 @@ module Day12 =
         match deg with
         | 0 -> (wx, wy)
         | _ -> rotate (-wy, wx) (deg - 90)
-        
         
     let rec move2 (location, waypoint) step =
         match step with
