@@ -1,6 +1,4 @@
-﻿
-
-namespace Advent2020
+﻿namespace Advent2020
 
 open System
 open System.Collections
