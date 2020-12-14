@@ -21,12 +21,23 @@ let ``Part 1`` () =
     
 [<Fact>]
 let ``Part 2 Example`` () =
-    let input = ""
+    let input = "mask = 000000000000000000000000000000X1001X
+mem[42] = 100
+mask = 00000000000000000000000000000000X0XX
+mem[26] = 1"
     let result = part2 input
-    Assert.Equal(295, result)
+    Assert.Equal(208UL, result)
+    
+[<Fact>]
+let ``Part 2 Example 2`` () =
+    let input = "mask = 10100000101101100110X001X0X001100X10
+mem[40461] = 1
+mem[6217] = 0"
+    let result = part2 input
+    Assert.Equal(16UL, result)
     
 [<Fact>]
 let ``Part 2`` () =
     let numbers = File.ReadAllText("Data/day14.txt")
     let result = part2 numbers
-    Assert.Equal(86729, result)
+    Assert.Equal(3434009980379UL, result)
