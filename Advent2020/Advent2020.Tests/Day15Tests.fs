@@ -56,4 +56,4 @@ let ``Part 1`` () =
 let ``Part 2`` () =
     let numbers = "16,11,15,0,1,7"
     let result = part1 30000000 numbers
-    Assert.Equal(42, result)
+    Assert.Equal(37312, result)
