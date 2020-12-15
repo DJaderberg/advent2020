@@ -53,13 +53,7 @@ let ``Part 1`` () =
     Assert.Equal(42, result)
     
 [<Fact>]
-let ``Part 2 Example`` () =
-    let input = ""
-    let result = part2 input
-    Assert.Equal(42, result)
-    
-[<Fact>]
 let ``Part 2`` () =
-    let numbers = ""
-    let result = part2 numbers
+    let numbers = "16,11,15,0,1,7"
+    let result = part1 30000000 numbers
     Assert.Equal(42, result)
