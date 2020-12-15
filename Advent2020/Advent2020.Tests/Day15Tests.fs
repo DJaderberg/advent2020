@@ -50,7 +50,7 @@ let ``Part 1 Example 6`` () =
 let ``Part 1`` () =
     let numbers = "16,11,15,0,1,7"
     let result = part1 2020 numbers
-    Assert.Equal(42, result)
+    Assert.Equal(662, result)
     
 [<Fact>]
 let ``Part 2`` () =
