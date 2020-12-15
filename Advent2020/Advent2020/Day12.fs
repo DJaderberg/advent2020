@@ -24,6 +24,7 @@ module Day12 =
         | 'S' -> South
         | 'L' -> Left
         | 'R' -> Right
+        | _ -> raise (Exception("No suitable direction found"))
     
     let instr = (anyChar |>> direction) .>>. (many1 digit |>> String.Concat |>> int) |>> (fun (f, v) -> f v)
     let all = sepEndBy1 instr newline .>> eof
@@ -48,6 +49,7 @@ module Day12 =
                 | 90 -> move (facing, location) (East i)
                 | 180 -> move (facing, location) (South i)
                 | 270 -> move (facing, location) (West i)
+                | _ -> raise (Exception("No suitable direction found"))
         | North i -> (facing, add location (0, i))
         | East i -> (facing, add location (-i, 0))
         | West i -> (facing, add location (i, 0))
