@@ -29,13 +29,23 @@ let ``Part 1`` () =
     
 [<Fact>]
 let ``Part 2 Example`` () =
-    let input = ""
+    let input = "class: 0-1 or 4-19
+row: 0-5 or 8-19
+seat: 0-13 or 16-19
+
+your ticket:
+11,12,13
+
+nearby tickets:
+3,9,18
+15,1,5
+5,14,9"
     let result = part2 input
-    Assert.Equal(436, result)
+    Assert.Equal(1L, result)
     
 [<Fact>]
 let ``Part 2`` () =
     let numbers = File.ReadAllText("Data/day16.txt")
     let result = part2 numbers
-    Assert.Equal(37312, result)
+    Assert.Equal(953713095011L, result)
 

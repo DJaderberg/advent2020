@@ -40,10 +40,37 @@ module Day16 =
                 array.[i] <- true
             array
         
-    let isOk (rulesArray : bool array) e = not rulesArray.[e]
+    let isOk (rulesArray : bool array) e = rulesArray.[e]
     let part1 input =
         let (rules, _, nearby) = parsec total input
         let rulesArray = List.fold setupRules (Array.zeroCreate 1000) rules
-        List.concat nearby |> List.filter (isOk rulesArray) |> List.sum
+        List.concat nearby |> List.filter (isOk rulesArray >> not) |> List.sum
+        
+    let isOkForRule value (Rule (_, (a,b), (c,d))) = (a <= value  &&  value <= b) || (c <= value && value <= d)
+    let filterRuleList (value, rs) = List.filter (isOkForRule value) rs
+    let x rulesDict names ticket = List.map (fun n -> Map.find n rulesDict) names
+    
+    let processTicket (ruless: Rule list list) (ticket: int list) =
+        let zipped = List.zip ticket ruless
+        List.map filterRuleList zipped
+        
+    let drawConclusions (known: (int * Rule) list) (next: (int * Rule list)) =
+        let addToKnown = snd next |> List.except (known |> List.map snd) |> List.head
+        (fst next, addToKnown) :: known
     let part2 input =
-        42
+        let (rules, ticket, nearby) = parsec total input
+        let myTicket = Array.ofList ticket
+        let rulesArray = List.fold setupRules (Array.zeroCreate 1000) rules
+        let validTickets = nearby |> List.filter (List.forall (isOk rulesArray))
+        let positionPossibilities = Array.zeroCreate (List.length rules) |> Array.map (fun _ -> rules) |> Array.toList
+        let calculated = List.fold processTicket positionPossibilities validTickets
+        let zip = List.indexed calculated |> List.sortBy (snd >> List.length)
+        let conclusions = List.fold drawConclusions [] zip
+        let interestingIndices =
+            conclusions
+            |> List.map (fun (index, (Rule (name, _, _))) -> (index, name))
+            |> List.filter (fun (_, name) -> name.Contains "departure")
+            |> List.map fst
+        interestingIndices
+        |> List.map (fun e -> myTicket.[e] |> int64)
+        |> List.fold (*) 1L
