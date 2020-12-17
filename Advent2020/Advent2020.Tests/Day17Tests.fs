@@ -23,18 +23,18 @@ let ``Part 1 Example`` () =
 let ``Part 1`` () =
     let numbers = File.ReadAllText("Data/day17.txt")
     let result = part1 6 numbers
-    Assert.Equal(19060, result)
+    Assert.Equal(426, result)
     
 [<Fact>]
 let ``Part 2 Example`` () =
     let input = ".#.
 ..#
 ###"
-    let result = part2 input
+    let result = part2 6 input
     Assert.Equal(848, result)
     
 [<Fact>]
 let ``Part 2`` () =
     let numbers = File.ReadAllText("Data/day17.txt")
-    let result = part2 numbers
-    Assert.Equal(95011, result)
+    let result = part2 6 numbers
+    Assert.Equal(1892, result)
