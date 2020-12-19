@@ -71,6 +71,18 @@ let ``Part 2 Example 4`` () =
     Assert.Equal(669060L, result)
     
 [<Fact>]
+let ``Part 2 Example 4b`` () =
+    let input = "5 * 9 * (7 * 3 * 12 * 3 + (8 + 6 * 4))"
+    let result = part2 input
+    Assert.Equal(669060L, result)
+    
+[<Fact>]
+let ``Part 2 Example 4c`` () =
+    let input = "5 * 9 * (7 * 3 * 12 * 3 + (14 * 4))"
+    let result = part2 input
+    Assert.Equal(669060L, result)
+    
+[<Fact>]
 let ``Part 2 Example 5`` () =
     let input = "((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2"
     let result = part2 input
