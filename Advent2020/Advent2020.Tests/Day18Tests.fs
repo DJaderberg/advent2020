@@ -92,4 +92,4 @@ let ``Part 2 Example 5`` () =
 let ``Part 2`` () =
     let numbers = File.ReadAllText("Data/day18.txt")
     let result = part2 numbers
-    Assert.Equal(1892L, result)
+    Assert.Equal(388966573054664L, result)
