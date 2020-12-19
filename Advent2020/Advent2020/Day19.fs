@@ -52,4 +52,12 @@ module Day19 =
         result
         |> List.length
         
-    let part2 (input: string) = 42
+    let part2 (input: string) = 
+        let (rules, data) = parsec all input
+        let rules =
+            rules
+            |> Map.add 8 (SubRules [[42]; [42;8]])
+            |> Map.add 11 (SubRules [[42; 31]; [42; 11; 31]])
+        let result = List.map (fun d -> eval rules (Map.find 0 rules) [d]) data |> List.filter (List.contains [])
+        result
+        |> List.length
