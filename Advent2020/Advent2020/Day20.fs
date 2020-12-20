@@ -34,17 +34,18 @@ module Day20 =
         | Left -> tile.[*,0]
         | Right -> tile.[*,9]
         
-    let rotations (tile: char[,]) =
-        let a = Array2D.zeroCreate 10 10 |> Array2D.mapi (fun x y _ -> tile.[y,9-x])
-        let b = Array2D.zeroCreate 10 10 |> Array2D.mapi (fun x y _ -> tile.[9-x,9-y])
-        let c = Array2D.zeroCreate 10 10 |> Array2D.mapi (fun x y _ -> tile.[9-y,x])
+    let rotations size (tile: char[,]) =
+        let maxIndex = size - 1
+        let a = Array2D.zeroCreate size size |> Array2D.mapi (fun x y _ -> tile.[y,maxIndex - x])
+        let b = Array2D.zeroCreate size size |> Array2D.mapi (fun x y _ -> tile.[maxIndex - x,maxIndex - y])
+        let c = Array2D.zeroCreate size size |> Array2D.mapi (fun x y _ -> tile.[maxIndex - y,x])
         [tile;a;b;c]
-    let variants (tile: char[,]) =
-        let transposed = Array2D.zeroCreate 10 10 |> Array2D.mapi (fun x y _ -> tile.[y,x])
-        [rotations tile; rotations transposed] |> List.concat
+    let variants size (tile: char[,]) =
+        let transposed = Array2D.zeroCreate size size |> Array2D.mapi (fun x y _ -> tile.[y,x])
+        [rotations size tile; rotations size transposed] |> List.concat
     let fulfills tile ((e,arr): Edge * char[]) = arr = getEdge e tile
     let findMatchSingle (requirements: (Edge * char[]) list) (tile: char[,]) =
-        let vs = variants tile
+        let vs = variants 10 tile
         let out = List.filter (fun v -> List.forall (fulfills v) requirements) vs
         out
         
@@ -93,5 +94,54 @@ module Day20 =
         |> List.map (fst >> int64)
         |> List.fold (*) 1L
         
+    let lineFromTile yIndex (tile: char[,]) = tile.[yIndex, 1..8]
+    let linesFromTiles (list: char[,] list) =
+        let line i =
+            let stuff = List.map (lineFromTile i) list
+            stuff |> Array.concat
+        [1..8] |> List.map line
         
-    let part2 (input: string) = 42L
+    let constructLargeArray (solved: Map<(int * int), int * char[,]>) =
+        let groupByYSortByX =
+            Map.toList solved
+            |> List.groupBy (fst >> snd)
+            |> List.sortBy fst
+            |> List.map snd
+            |> List.map (List.sortBy (fst >> fst))
+        let preLines =
+            groupByYSortByX
+            |> List.map (List.map snd)
+        let lines =
+            preLines
+            |> List.map (List.map snd)
+            |> List.map linesFromTiles
+        lines
+        |> List.concat
+        |> array2D
+        
+    let findSeamonsters (array: char[,]) =
+        let top = [18]
+        let center = [0;5;6;11;12;17;18;19]
+        let bottom = [1;4;7;10;13;16]
+        let monsterAtIndex (x,y) =
+            let resultC = List.forall (fun i -> array.[x + i, y] = '#') center
+            let resultT = List.forall (fun i -> array.[x + i, y - 1] = '#') top
+            let resultB = List.forall (fun i -> array.[x + i, y + 1] = '#') bottom
+            resultC && resultT && resultB
+        let xs = [ 0 .. Array2D.length1 array - 20 ]
+        let ys = [ 1 .. Array2D.length2 array - 2 ]
+        Seq.allPairs xs ys
+        |> Seq.filter monsterAtIndex
+        |> List.ofSeq
+        
+    let part2 (input: string) =
+        let tiles = parsec tiles input
+        let solved = solve Map.empty tiles |> Seq.head
+        let big = constructLargeArray solved
+        let variants = variants (Array2D.length1 big) big
+        let zipped = List.zip (List.map findSeamonsters variants) variants
+        let correctVariant = List.maxBy (fst >> List.length) zipped
+        let numSeamonsters = fst correctVariant |> List.length
+        let mutable hashes = 0
+        Array2D.iter (fun v -> if v = '#' then hashes <- hashes + 1 else ()) big
+        hashes - 15 * numSeamonsters
