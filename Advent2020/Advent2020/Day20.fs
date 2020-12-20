@@ -7,7 +7,6 @@ open FParsec
 
 module Day20 =
     type Edge = Above | Below | Left | Right
-    type Tile = Tile of int * char[,]
     
     let idLine = pstring "Tile " >>. many1Chars digit |>> int .>> pchar ':' .>> newline
     let arrayLine = many1 (anyOf ['#';'.'])
@@ -52,7 +51,7 @@ module Day20 =
     let findOptions (currentSolution: Map<int * int,int * char[,]>) (options: Map<int, char[,]>) (x,y) =
         let requirements =
             [(x-1,y,Left);(x+1,y,Right);(x,y-1,Above);(x,y+1,Below)]
-            |> List.choose (fun (x,y,e) -> Map.tryFind (x,y) currentSolution |> Option.map (fun (i,t) -> (e, getEdge (opposite e) t)))
+            |> List.choose (fun (x,y,e) -> Map.tryFind (x,y) currentSolution |> Option.map (fun (_,t) -> (e, getEdge (opposite e) t)))
         let matches = List.map (fun (i, t) -> (i, findMatchSingle requirements t)) (Map.toList options)
         matches 
         |> List.map (fun (i, cArrays) -> List.map (fun c -> (i,c)) cArrays)
@@ -76,7 +75,7 @@ module Day20 =
             let ps = findPositionOptions solved
             let options = ps |> List.map (fun pos -> findOptions solved remaining pos |> List.map (fun e -> (pos, e))) |> List.concat
             let addToSolved p e = Map.add p e solved
-            let removeFromRemaining (i, tile) = Map.remove i remaining
+            let removeFromRemaining (i, _) = Map.remove i remaining
             Seq.map (fun (pos, e) -> solve (addToSolved pos e) (removeFromRemaining e)) options
             |> Seq.concat
     
@@ -119,7 +118,7 @@ module Day20 =
         |> List.concat
         |> array2D
         
-    let findSeamonsters (array: char[,]) =
+    let findSeaMonsters (array: char[,]) =
         let top = [18]
         let center = [0;5;6;11;12;17;18;19]
         let bottom = [1;4;7;10;13;16]
@@ -139,9 +138,9 @@ module Day20 =
         let solved = solve Map.empty tiles |> Seq.head
         let big = constructLargeArray solved
         let variants = variants (Array2D.length1 big) big
-        let zipped = List.zip (List.map findSeamonsters variants) variants
+        let zipped = List.zip (List.map findSeaMonsters variants) variants
         let correctVariant = List.maxBy (fst >> List.length) zipped
-        let numSeamonsters = fst correctVariant |> List.length
+        let numSeaMonsters = fst correctVariant |> List.length
         let mutable hashes = 0
         Array2D.iter (fun v -> if v = '#' then hashes <- hashes + 1 else ()) big
-        hashes - 15 * numSeamonsters
+        hashes - 15 * numSeaMonsters
