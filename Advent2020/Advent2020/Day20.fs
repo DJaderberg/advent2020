@@ -34,7 +34,14 @@ module Day20 =
         | Left -> tile.[*,0]
         | Right -> tile.[*,9]
         
-    let variants tile = [tile] // TODO: Actually implement this...
+    let rotations (tile: char[,]) =
+        let a = Array2D.zeroCreate 10 10 |> Array2D.mapi (fun x y _ -> tile.[y,9-x])
+        let b = Array2D.zeroCreate 10 10 |> Array2D.mapi (fun x y _ -> tile.[9-x,9-y])
+        let c = Array2D.zeroCreate 10 10 |> Array2D.mapi (fun x y _ -> tile.[9-y,x])
+        [tile;a;b;c]
+    let variants (tile: char[,]) =
+        let transposed = Array2D.zeroCreate 10 10 |> Array2D.mapi (fun x y _ -> tile.[y,x])
+        [rotations tile; rotations transposed] |> List.concat
     let fulfills tile ((e,arr): Edge * char[]) = arr = getEdge e tile
     let findMatchSingle (requirements: (Edge * char[]) list) (tile: char[,]) =
         let vs = variants tile
