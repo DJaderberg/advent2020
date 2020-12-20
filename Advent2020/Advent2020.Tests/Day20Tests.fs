@@ -231,7 +231,7 @@ Tile 3079:
 let ``Part 1`` () =
     let numbers = File.ReadAllText("Data/day20.txt")
     let result = part1 numbers
-    Assert.Equal(279L, result)
+    Assert.Equal(107399567124539L, result)
     
 [<Fact>]
 let ``Part 2 Example`` () =
