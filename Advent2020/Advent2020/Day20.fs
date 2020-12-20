@@ -72,9 +72,19 @@ module Day20 =
             Seq.map (fun (pos, e) -> solve (addToSolved pos e) (removeFromRemaining e)) options
             |> Seq.concat
     
+    let corners (locations: (int * int) list) =
+        let xMin = locations |> List.map fst |> List.min
+        let xMax = locations |> List.map fst |> List.max
+        let yMin = locations |> List.map snd |> List.min
+        let yMax = locations |> List.map snd |> List.max
+        [(xMin,yMin);(xMin,yMax);(xMax,yMin);(xMax,yMax)]
     let part1 (input: string) =
         let tiles = parsec tiles input
         let solved = solve Map.empty tiles |> Seq.head
-        24 |> int64
+        corners (Map.toList solved |> List.map fst)
+        |> List.map (fun c -> Map.find c solved)
+        |> List.map (fst >> int64)
+        |> List.fold (*) 1L
+        
         
     let part2 (input: string) = 42L
