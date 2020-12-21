@@ -21,12 +21,15 @@ let ``Part 1`` () =
     
 [<Fact>]
 let ``Part 2 Example`` () =
-    let input = ""
+    let input = "mxmxvkd kfcds sqjhc nhms (contains dairy, fish)
+trh fvjkl sbzzf mxmxvkd (contains dairy)
+sqjhc fvjkl (contains soy)
+sqjhc mxmxvkd sbzzf (contains fish)"
     let result = part2 input
-    Assert.Equal(0, result)
+    Assert.Equal("mxmxvkd,sqjhc,fvjkl", result)
     
 [<Fact>]
 let ``Part 2`` () =
     let numbers = File.ReadAllText("Data/day21.txt")
     let result = part2 numbers
-    Assert.Equal(0, result)
+    Assert.Equal("nfnfk,nbgklf,clvr,fttbhdr,qjxxpr,hdsm,sjhds,xchzh", result)

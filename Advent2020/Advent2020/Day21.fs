@@ -59,4 +59,12 @@ module Day21 =
         countSafeOccurences
             ingredientsWithAllergens
             ingredientOccurrences
-    let part2 (input: string) = 42
+    let part2 (input: string) =
+        let parsed = parsec lines input
+        let firstPass = List.fold filterLine Map.empty parsed
+        let allAllergens = List.map snd parsed |> List.concat |> Set.ofList
+        let solution = drawConclusionsRec allAllergens Map.empty firstPass
+        let ingredientsWithAllergens = solution |> Map.toList |> List.sortBy fst |> List.map snd
+        let result = (List.fold (fun s e -> s + "," + e) "" ingredientsWithAllergens).Trim(',')
+        result
+        
