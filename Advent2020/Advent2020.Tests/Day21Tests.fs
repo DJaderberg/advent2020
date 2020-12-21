@@ -1,4 +1,5 @@
-﻿module Advent2020.Tests.Day21Tests
+﻿
+module Advent2020.Tests.Day21Tests
 
 open System.IO
 open Xunit
