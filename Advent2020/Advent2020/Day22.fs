@@ -19,7 +19,7 @@ module Day22 =
     let dequeue (q: Queue<'a>) =
         let found, value = q.TryDequeue()
         if found then Some value else None
-    let rec combat (q1: Queue<int>) (q2: Queue<int>) =
+    let rec combat q1 q2 =
         match (dequeue q1, dequeue q2) with
         | (Some c1, Some c2) when c1 > c2 -> q1.Enqueue(c1); q1.Enqueue(c2); combat q1 q2
         | (Some c1, Some c2) when c1 < c2 -> q2.Enqueue(c2); q2.Enqueue(c1); combat q1 q2
@@ -27,15 +27,16 @@ module Day22 =
         | (None, Some c) -> Some (2, q2.Prepend(c))
         | _ -> None
         
-    let rec recCombat (decksSeen: Set<int list * int list>) (q1: Queue<int>) (q2: Queue<int>) =
+    let rec recCombat decksSeen q1 q2 =
         let currentState = (q1 |> Seq.toList, q2 |> Seq.toList)
         if Set.contains currentState decksSeen then
             Some (1, q1 :> IEnumerable<int>)
         else
             let subQueue (q: Queue<'a>) count = Queue(q.Take(count))
-            let inline recurse (q: Queue<int>) cs =
+            let inline recurse (q: Queue<'a>) cs =
                List.iter q.Enqueue cs
-               recCombat (Set.add currentState decksSeen) q1 q2 
+               recCombat (Set.add currentState decksSeen) q1 q2
+               
             match (dequeue q1, dequeue q2) with
             | (Some c1, Some c2) when c1 <= q1.Count && c2 <= q2.Count ->
                 match recCombat Set.empty (subQueue q1 c1) (subQueue q2 c2) with
@@ -56,7 +57,7 @@ module Day22 =
         
     let play game input =
         let (p1, p2) = parsec players input
-        let makeQ p = Queue<int>(Seq.ofList p)
+        let makeQ p = Queue(Seq.ofList p)
         let winner = game (makeQ p1) (makeQ p2)
         Option.map (snd >> score) winner
         |> Option.defaultValue 0
