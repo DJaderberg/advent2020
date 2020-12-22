@@ -37,15 +37,17 @@ module Day22 =
             let newDecks = Set.add currentState decksSeen
             match (dequeue q1, dequeue q2) with
             | (Some c1, Some c2) ->
+                let inline recurse player =
+                   let (q, a, b) = if player = 1 then (q1, c1, c2) else (q2, c2, c1)
+                   q.Enqueue(a); q.Enqueue(b); recCombat newDecks q1 q2 
                 if c1 <= q1.Count && c2 <= q2.Count then
                     let subQ1 = Queue(q1.Take(c1))
                     let subQ2 = Queue(q2.Take(c2))
                     match recCombat Set.empty subQ1 subQ2 with
-                    | (Some 1, _) -> q1.Enqueue(c1); q1.Enqueue(c2); recCombat newDecks q1 q2
-                    | (Some 2, _) -> q2.Enqueue(c2); q2.Enqueue(c1); recCombat newDecks q1 q2
+                    | (Some p, _) -> recurse p
                     | _ -> recCombat newDecks q1 q2
-                else if c1 > c2 then q1.Enqueue(c1); q1.Enqueue(c2); recCombat newDecks q1 q2
-                else if c2 > c1 then q2.Enqueue(c2); q2.Enqueue(c1); recCombat newDecks q1 q2
+                else if c1 > c2 then recurse 1
+                else if c2 > c1 then recurse 2
                 else recCombat newDecks q1 q2
             | (Some c, None) -> (Some 1, q1.Prepend(c))
             | (None, Some c) -> (Some 2, q2.Prepend(c))
