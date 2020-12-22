@@ -34,9 +34,9 @@ module Day22 =
         if Set.contains currentState decksSeen then
             Some (1, q1 :> IEnumerable<int>)
         else
-            let newDecks = Set.add currentState decksSeen
             match (dequeue q1, dequeue q2) with
             | (Some c1, Some c2) ->
+                let newDecks = Set.add currentState decksSeen
                 let inline recurse player =
                    let (q, a, b) = if player = 1 then (q1, c1, c2) else (q2, c2, c1)
                    q.Enqueue(a); q.Enqueue(b); recCombat newDecks q1 q2 
@@ -58,18 +58,14 @@ module Day22 =
         |> Seq.rev
         |> Seq.mapi (fun i e -> (i + 1) * e)
         |> Seq.sum
-    let part1 (input: string) =
+        
+    let play game input =
         let (p1, p2) = parsec players input
-        let q1 = Queue<int>(Seq.ofList p1)
-        let q2 = Queue<int>(Seq.ofList p2)
-        let winner = combat q1 q2
+        let makeQ p = Queue<int>(Seq.ofList p)
+        let winner = game (makeQ p1) (makeQ p2)
         Option.map (snd >> score) winner
         |> Option.defaultValue 0
-    let part2 (input: string) =
-        let (p1, p2) = parsec players input
-        let q1 = Queue<int>(Seq.ofList p1)
-        let q2 = Queue<int>(Seq.ofList p2)
-        let winner = recCombat Set.empty q1 q2
-        Option.map (snd >> score) winner
-        |> Option.defaultValue 0
+        
+    let part1 = play combat
+    let part2 = play (recCombat Set.empty)
         
