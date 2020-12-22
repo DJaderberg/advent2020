@@ -58,8 +58,8 @@ module Day22 =
     let play game input =
         let (p1, p2) = parsec players input
         let makeQ p = Queue(Seq.ofList p)
-        let winner = game (makeQ p1) (makeQ p2)
-        Option.map (snd >> score) winner
+        game (makeQ p1) (makeQ p2)
+        |> Option.map (snd >> score)
         |> Option.defaultValue 0
         
     let part1 = play combat
