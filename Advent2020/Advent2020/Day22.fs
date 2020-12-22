@@ -28,25 +28,22 @@ module Day22 =
         | _ -> None
         
     let rec recCombat (decksSeen: Set<int list * int list>) (q1: Queue<int>) (q2: Queue<int>) =
-        let currentState = q1 |> Seq.toList, q2 |> Seq.toList
+        let currentState = (q1 |> Seq.toList, q2 |> Seq.toList)
         if Set.contains currentState decksSeen then
             Some (1, q1 :> IEnumerable<int>)
         else
+            let subQueue (q: Queue<'a>) count = Queue(q.Take(count))
+            let inline recurse (q: Queue<int>) cs =
+               List.iter q.Enqueue cs
+               recCombat (Set.add currentState decksSeen) q1 q2 
             match (dequeue q1, dequeue q2) with
-            | (Some c1, Some c2) ->
-                let newDecks = Set.add currentState decksSeen
-                let inline recurse player =
-                   let (q, a, b) = if player = 1 then (q1, c1, c2) else (q2, c2, c1)
-                   q.Enqueue(a); q.Enqueue(b); recCombat newDecks q1 q2 
-                if c1 <= q1.Count && c2 <= q2.Count then
-                    let subQ1 = Queue(q1.Take(c1))
-                    let subQ2 = Queue(q2.Take(c2))
-                    match recCombat Set.empty subQ1 subQ2 with
-                    | Some (p, _) -> recurse p
-                    | _ -> recCombat newDecks q1 q2
-                else if c1 > c2 then recurse 1
-                else if c2 > c1 then recurse 2
-                else recCombat newDecks q1 q2
+            | (Some c1, Some c2) when c1 <= q1.Count && c2 <= q2.Count ->
+                match recCombat Set.empty (subQueue q1 c1) (subQueue q2 c2) with
+                | Some (p, _) -> if p = 1 then recurse q1 [c1;c2] else recurse q2 [c2;c1]
+                | _ -> recurse q1 []
+            | (Some c1, Some c2) when c1 > c2 -> recurse q1 [c1;c2]
+            | (Some c1, Some c2) when c1 < c2 -> recurse q2 [c2;c1]
+            | (Some _, Some _) -> recurse q1 []
             | (Some c, None) -> Some (1, q1.Prepend(c))
             | (None, Some c) -> Some (2, q2.Prepend(c))
             | (None, None) -> None
