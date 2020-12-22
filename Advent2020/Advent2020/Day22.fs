@@ -21,13 +21,11 @@ module Day22 =
         if found then Some value else None
     let rec combat (q1: Queue<int>) (q2: Queue<int>) =
         match (dequeue q1, dequeue q2) with
-        | (Some c1, Some c2) ->
-            if c1 > c2 then q1.Enqueue(c1); q1.Enqueue(c2); combat q1 q2
-            else if c2 > c1 then q2.Enqueue(c2); q2.Enqueue(c1); combat q1 q2
-            else combat q1 q2
+        | (Some c1, Some c2) when c1 > c2 -> q1.Enqueue(c1); q1.Enqueue(c2); combat q1 q2
+        | (Some c1, Some c2) when c1 < c2 -> q2.Enqueue(c2); q2.Enqueue(c1); combat q1 q2
         | (Some c, None) -> Some (1, q1.Prepend(c))
         | (None, Some c) -> Some (2, q2.Prepend(c))
-        | (None, None) -> None
+        | _ -> None
         
     let rec recCombat (decksSeen: Set<int list * int list>) (q1: Queue<int>) (q2: Queue<int>) =
         let currentState = q1 |> Seq.toList, q2 |> Seq.toList
