@@ -6,15 +6,27 @@ open Advent2020.Day22
 
 [<Fact>]
 let ``Part 1 Example`` () =
-    let input = ""
+    let input = "Player 1:
+9
+2
+6
+3
+1
+
+Player 2:
+5
+8
+4
+7
+10"
     let result = part1 input
-    Assert.Equal(5, result)
+    Assert.Equal(306, result)
     
 [<Fact>]
 let ``Part 1`` () =
     let numbers = File.ReadAllText("Data/day22.txt")
     let result = part1 numbers
-    Assert.Equal(2170, result)
+    Assert.Equal(35013, result)
     
 [<Fact>]
 let ``Part 2 Example`` () =

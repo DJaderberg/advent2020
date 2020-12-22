@@ -1,8 +1,6 @@
 ﻿namespace Advent2020
 
 open System
-open System.Linq.Expressions
-open System.Reflection.Emit
 open FParsec
 
 module Day20 =
