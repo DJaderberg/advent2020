@@ -30,7 +30,32 @@ let ``Part 1`` () =
     
 [<Fact>]
 let ``Part 2 Example`` () =
-    let input = ""
+    let input = "Player 1:
+9
+2
+6
+3
+1
+
+Player 2:
+5
+8
+4
+7
+10"
+    let result = part2 input
+    Assert.Equal(291, result)
+    
+[<Fact>]
+let ``Part 2 Example Possibly infinite`` () =
+    let input = "Player 1:
+43
+19
+
+Player 2:
+2
+29
+14"
     let result = part2 input
     Assert.Equal(0, result)
     

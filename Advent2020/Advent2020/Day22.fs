@@ -19,15 +19,37 @@ module Day22 =
     let dequeue (q: Queue<'a>) =
         let found, value = q.TryDequeue()
         if found then Some value else None
-    let rec play (q1: Queue<int>) (q2: Queue<int>) =
+    let rec combat (q1: Queue<int>) (q2: Queue<int>) =
         match (dequeue q1, dequeue q2) with
         | (Some c1, Some c2) ->
-            if c1 > c2 then q1.Enqueue(c1); q1.Enqueue(c2); play q1 q2
-            else if c2 > c1 then q2.Enqueue(c2); q2.Enqueue(c1); play q1 q2
-            else play q1 q2
+            if c1 > c2 then q1.Enqueue(c1); q1.Enqueue(c2); combat q1 q2
+            else if c2 > c1 then q2.Enqueue(c2); q2.Enqueue(c1); combat q1 q2
+            else combat q1 q2
         | (Some c, None) -> q1.Prepend(c)
         | (None, Some c) -> q2.Prepend(c)
         | (None, None) -> Seq.empty
+        
+    let rec recCombat (decksSeen: Set<int list * int list>) (q1: Queue<int>) (q2: Queue<int>): int option * int seq =
+        let currentState = Queue(q1) |> Seq.toList, Queue(q2) |> Seq.toList
+        if Set.contains currentState decksSeen then
+            (Some 1, q1 :> IEnumerable<int>)
+        else
+            let newDecks = Set.add currentState decksSeen
+            match (dequeue q1, dequeue q2) with
+            | (Some c1, Some c2) ->
+                if c1 <= q1.Count && c2 <= q2.Count then
+                    let subQ1 = Queue(Queue(q1).Take(c1))
+                    let subQ2 = Queue(Queue(q2).Take(c2))
+                    match recCombat Set.empty subQ1 subQ2 with
+                    | (Some 1, _) -> q1.Enqueue(c1); q1.Enqueue(c2); recCombat newDecks q1 q2
+                    | (Some 2, _) -> q2.Enqueue(c2); q2.Enqueue(c1); recCombat newDecks q1 q2
+                    | _ -> recCombat newDecks q1 q2
+                else if c1 > c2 then q1.Enqueue(c1); q1.Enqueue(c2); recCombat newDecks q1 q2
+                else if c2 > c1 then q2.Enqueue(c2); q2.Enqueue(c1); recCombat newDecks q1 q2
+                else recCombat newDecks q1 q2
+            | (Some c, None) -> (Some 1, q1.Prepend(c))
+            | (None, Some c) -> (Some 2, q2.Prepend(c))
+            | (None, None) -> (None, Seq.empty)
     
     let score cards =
         cards
@@ -38,7 +60,12 @@ module Day22 =
         let ((_, p1), (_,p2)) = parsec players input
         let q1 = Queue<int>(Seq.ofList p1)
         let q2 = Queue<int>(Seq.ofList p2)
-        let winningDeck = play q1 q2
+        let winningDeck = combat q1 q2
         score winningDeck
-    let part2 (input: string) = 42
+    let part2 (input: string) =
+        let ((_, p1), (_,p2)) = parsec players input
+        let q1 = Queue<int>(Seq.ofList p1)
+        let q2 = Queue<int>(Seq.ofList p2)
+        let (_, winningDeck) = recCombat Set.empty q1 q2
+        score winningDeck
         
