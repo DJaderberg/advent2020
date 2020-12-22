@@ -8,7 +8,7 @@ open FParsec
 module Day22 =
     let card = many1Chars digit |>> int
     let cards = sepEndBy1 card newline
-    let playerId = pstring "Player " >>.anyChar .>> pchar ':' .>> newline
+    let playerId = pstring "Player " >>. anyChar .>> pchar ':' .>> newline
     let player = playerId >>. cards
     let players = player .>> newline .>>. player
     let parsec parser input =
@@ -25,14 +25,14 @@ module Day22 =
             if c1 > c2 then q1.Enqueue(c1); q1.Enqueue(c2); combat q1 q2
             else if c2 > c1 then q2.Enqueue(c2); q2.Enqueue(c1); combat q1 q2
             else combat q1 q2
-        | (Some c, None) -> q1.Prepend(c)
-        | (None, Some c) -> q2.Prepend(c)
-        | (None, None) -> Seq.empty
+        | (Some c, None) -> Some (1, q1.Prepend(c))
+        | (None, Some c) -> Some (2, q2.Prepend(c))
+        | (None, None) -> None
         
-    let rec recCombat (decksSeen: Set<int list * int list>) (q1: Queue<int>) (q2: Queue<int>): int option * int seq =
+    let rec recCombat (decksSeen: Set<int list * int list>) (q1: Queue<int>) (q2: Queue<int>) =
         let currentState = q1 |> Seq.toList, q2 |> Seq.toList
         if Set.contains currentState decksSeen then
-            (Some 1, q1 :> IEnumerable<int>)
+            Some (1, q1 :> IEnumerable<int>)
         else
             let newDecks = Set.add currentState decksSeen
             match (dequeue q1, dequeue q2) with
@@ -44,14 +44,14 @@ module Day22 =
                     let subQ1 = Queue(q1.Take(c1))
                     let subQ2 = Queue(q2.Take(c2))
                     match recCombat Set.empty subQ1 subQ2 with
-                    | (Some p, _) -> recurse p
+                    | Some (p, _) -> recurse p
                     | _ -> recCombat newDecks q1 q2
                 else if c1 > c2 then recurse 1
                 else if c2 > c1 then recurse 2
                 else recCombat newDecks q1 q2
-            | (Some c, None) -> (Some 1, q1.Prepend(c))
-            | (None, Some c) -> (Some 2, q2.Prepend(c))
-            | (None, None) -> (None, Seq.empty)
+            | (Some c, None) -> Some (1, q1.Prepend(c))
+            | (None, Some c) -> Some (2, q2.Prepend(c))
+            | (None, None) -> None
     
     let score cards =
         cards
@@ -62,12 +62,14 @@ module Day22 =
         let (p1, p2) = parsec players input
         let q1 = Queue<int>(Seq.ofList p1)
         let q2 = Queue<int>(Seq.ofList p2)
-        let winningDeck = combat q1 q2
-        score winningDeck
+        let winner = combat q1 q2
+        Option.map (snd >> score) winner
+        |> Option.defaultValue 0
     let part2 (input: string) =
         let (p1, p2) = parsec players input
         let q1 = Queue<int>(Seq.ofList p1)
         let q2 = Queue<int>(Seq.ofList p2)
-        let (_, winningDeck) = recCombat Set.empty q1 q2
-        score winningDeck
+        let winner = recCombat Set.empty q1 q2
+        Option.map (snd >> score) winner
+        |> Option.defaultValue 0
         
