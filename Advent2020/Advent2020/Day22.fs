@@ -9,7 +9,7 @@ module Day22 =
     let card = many1Chars digit |>> int
     let cards = sepEndBy1 card newline
     let playerId = pstring "Player " >>.anyChar .>> pchar ':' .>> newline
-    let player = playerId .>>. cards
+    let player = playerId >>. cards
     let players = player .>> newline .>>. player
     let parsec parser input =
         match run parser input with
@@ -59,13 +59,13 @@ module Day22 =
         |> Seq.mapi (fun i e -> (i + 1) * e)
         |> Seq.sum
     let part1 (input: string) =
-        let ((_, p1), (_,p2)) = parsec players input
+        let (p1, p2) = parsec players input
         let q1 = Queue<int>(Seq.ofList p1)
         let q2 = Queue<int>(Seq.ofList p2)
         let winningDeck = combat q1 q2
         score winningDeck
     let part2 (input: string) =
-        let ((_, p1), (_,p2)) = parsec players input
+        let (p1, p2) = parsec players input
         let q1 = Queue<int>(Seq.ofList p1)
         let q2 = Queue<int>(Seq.ofList p2)
         let (_, winningDeck) = recCombat Set.empty q1 q2
