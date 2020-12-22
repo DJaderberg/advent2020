@@ -57,10 +57,11 @@ Player 2:
 29
 14"
     let result = part2 input
-    Assert.Equal(0, result)
+    // Score is not really important here, just that there's no infinite loop
+    Assert.Equal(105, result)
     
 [<Fact>]
 let ``Part 2`` () =
     let numbers = File.ReadAllText("Data/day22.txt")
     let result = part2 numbers
-    Assert.Equal(0, result)
+    Assert.Equal(32806, result)

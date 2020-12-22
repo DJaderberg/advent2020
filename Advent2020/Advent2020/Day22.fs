@@ -30,7 +30,7 @@ module Day22 =
         | (None, None) -> Seq.empty
         
     let rec recCombat (decksSeen: Set<int list * int list>) (q1: Queue<int>) (q2: Queue<int>): int option * int seq =
-        let currentState = Queue(q1) |> Seq.toList, Queue(q2) |> Seq.toList
+        let currentState = q1 |> Seq.toList, q2 |> Seq.toList
         if Set.contains currentState decksSeen then
             (Some 1, q1 :> IEnumerable<int>)
         else
@@ -38,8 +38,8 @@ module Day22 =
             match (dequeue q1, dequeue q2) with
             | (Some c1, Some c2) ->
                 if c1 <= q1.Count && c2 <= q2.Count then
-                    let subQ1 = Queue(Queue(q1).Take(c1))
-                    let subQ2 = Queue(Queue(q2).Take(c2))
+                    let subQ1 = Queue(q1.Take(c1))
+                    let subQ2 = Queue(q2.Take(c2))
                     match recCombat Set.empty subQ1 subQ2 with
                     | (Some 1, _) -> q1.Enqueue(c1); q1.Enqueue(c2); recCombat newDecks q1 q2
                     | (Some 2, _) -> q2.Enqueue(c2); q2.Enqueue(c1); recCombat newDecks q1 q2
