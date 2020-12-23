@@ -19,12 +19,12 @@ let ``Part 1`` () =
     
 [<Fact>]
 let ``Part 2 Example`` () =
-    let input = ""
-    let result = part2 input
-    Assert.Equal(0, result)
+    let input = "389125467"
+    let result = part2 10000000 input
+    Assert.Equal(149245887792L, result)
     
 [<Fact>]
 let ``Part 2`` () =
-    let numbers = File.ReadAllText("Data/day23.txt")
-    let result = part2 numbers
-    Assert.Equal(0, result)
+    let input = "792845136"
+    let result = part2 10000000 input
+    Assert.Equal(0L, result)
