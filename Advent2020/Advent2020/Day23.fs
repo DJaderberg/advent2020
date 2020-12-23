@@ -26,21 +26,22 @@ module Day23 =
             let (h :: t) = List.concat [before; d :: picked; after]
             List.append t [h]
             
-    let rec pickDest2 len picked x =
+    let rec pickDest2 len n1 n2 n3 x =
         let value = x - 1 
-        let v = if value = 0 then len else value
-        if List.contains v picked then pickDest2 len picked (v)
-    let fastRound (array: int[]) index =
-        let len = 1000000
-        let value = index
-        let n1 = array.[value]
-        let n2 = array.[n1]
-        let n3 = array.[n2]
-        let dest = (pickDestination len value [n1;n2;n3])
-        array.[value] <- array.[n3]
-        array.[n3] <- array.[dest]
-        array.[dest] <- n1
-        array.[value]
+        let v = if value = 0 then len - 1 else value
+        if n1 = value || n2 = value || n3 = value then (pickDest2 len n1 n2 n3 v)
+        else v
+        
+    let fastRound len (array: int[]) current =
+        let value = current
+        let n1 = array.[value] % len
+        let n2 = array.[n1] % len
+        let n3 = array.[n2] % len
+        let dest = (pickDest2 len n1 n2 n3 value) % len
+        array.[current] <- array.[n3] % len
+        array.[n3] <- array.[dest] % len
+        array.[dest] <- n1 % len
+        array.[current]
     
     let rec play r rounds state =
         match rounds with
@@ -64,24 +65,40 @@ module Day23 =
         let v2 = array.[v]
         (int64 v) * (int64 v2)
         
-    let part2 rounds (input: string) =
-        let len = 1000000
+    let part2implForPart1 len rounds (input: string) =
         let start = Seq.toList input |> List.map (fun c -> c.ToString()) |> List.map Int32.Parse
+        let initializer = Seq.zip (0 :: start) start |> Seq.toList
+        let array =
+            Array.zeroCreate (len + 1)
+            |> Array.mapi (fun i _ -> i + 1)
+        List.iter (fun (i, v) -> array.[i] <- v) initializer
+        array.[len] <- 1
+        //array.[7] <- 3
+        array.[List.last start] <- List.head start
+        let result = play (fastRound len array) rounds (List.head start)
+        answer (List.ofArray array)
+        
+    let part2 len rounds (input: string) =
+        let start = Seq.toList input |> List.map (fun c -> c.ToString()) |> List.map Int32.Parse
+        let initializer = Seq.zip (0 :: start) (List.append start [List.length start + 1]) |> Seq.toList
         let array =
             Array.zeroCreate (len + 1)
             |> Array.mapi (fun i _ -> i + 1)
         "389125467" |> ignore
-        array.[0] <- 3
-        array.[3] <- 8
-        array.[8] <- 9
-        array.[9] <- 1
-        array.[1] <- 2
-        array.[2] <- 5
-        array.[5] <- 4
-        array.[4] <- 6
-        array.[6] <- 7
-        array.[7] <- 10
-        array.[len] <- 1
-        let result = play (fastRound array) rounds array.[0]
+        List.iter (fun (i, v) -> array.[i] <- v) initializer
+        //array.[0] <- 3
+        //array.[3] <- 8
+        //array.[8] <- 9
+        //array.[9] <- 1
+        //array.[1] <- 2
+        //array.[2] <- 5
+        //array.[5] <- 4
+        //array.[4] <- 6
+        //array.[6] <- 7
+        //array.[7] <- 10
+        //array.[List.last start] <- List.head start
+        array.[List.last start] <- 10
+        array.[len] <- List.head start
+        let result = play (fastRound len array) rounds (List.head start)
         answer2 array
         
