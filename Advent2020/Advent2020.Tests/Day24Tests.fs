@@ -44,12 +44,31 @@ let ``Part 1`` () =
     
 [<Fact>]
 let ``Part 2 Example`` () =
-    let input = ""
-    let result = part2 input
-    Assert.Equal(0, result)
+    let input = "sesenwnenenewseeswwswswwnenewsewsw
+neeenesenwnwwswnenewnwwsewnenwseswesw
+seswneswswsenwwnwse
+nwnwneseeswswnenewneswwnewseswneseene
+swweswneswnenwsewnwneneseenw
+eesenwseswswnenwswnwnwsewwnwsene
+sewnenenenesenwsewnenwwwse
+wenwwweseeeweswwwnwwe
+wsweesenenewnwwnwsenewsenwwsesesenwne
+neeswseenwwswnwswswnw
+nenwswwsewswnenenewsenwsenwnesesenew
+enewnwewneswsewnwswenweswnenwsenwsw
+sweneswneswneneenwnewenewwneswswnese
+swwesenesewenwneswnwwneseswwne
+enesenwswwswneneswsenwnewswseenwsese
+wnwnesenesenenwwnenwsewesewsesesew
+nenewswnwewswnenesenwnesewesw
+eneswnwswnwsenenwnwnwwseeswneewsenese
+neswnwewnwnwseenwseesewsenwsweewe
+wseweeenwnesenwwwswnew"
+    let result = part2 100 input
+    Assert.Equal(2208, result)
     
 [<Fact>]
 let ``Part 2`` () =
     let input = File.ReadAllText("Data/day24.txt")
-    let result = part2 input
+    let result = part2 100 input
     Assert.Equal(0, result)
