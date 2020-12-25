@@ -40,7 +40,7 @@ let ``Part 1 example flip origo`` () =
 let ``Part 1`` () =
     let input = File.ReadAllText("Data/day24.txt")
     let result = part1 input
-    Assert.Equal(0, result)
+    Assert.Equal(549, result)
     
 [<Fact>]
 let ``Part 2 Example`` () =
@@ -71,4 +71,4 @@ wseweeenwnesenwwwswnew"
 let ``Part 2`` () =
     let input = File.ReadAllText("Data/day24.txt")
     let result = part2 100 input
-    Assert.Equal(0, result)
+    Assert.Equal(4147, result)
